@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+  
+
+  
+  
+<configuration>
+
+  <!-- 引入外部配置文件 -->
+  <properties resource="property/mysql.properties"></properties>
+
+  <settings>
+  	<setting name="logImpl" value="LOG4J"></setting>
+  	<setting name="mapUnderscoreToCamelCase" value="true"></setting>
+  </settings>
+ 
+  <typeAliases>
+  	<package name="com.lin.mybatis.simple.model"/>
+  </typeAliases>
+ 
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="${driver}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+      </dataSource>
+    </environment>
+  </environments>
+  
+  <mappers>
+  
+    <mapper resource="com/lin/mybatis/simple/mapper/CountryMapper.xml"/>
+    <mapper resource="com/lin/mybatis/simple/mapper/PrivilegeMapper.xml"/>
+    <mapper resource="com/lin/mybatis/simple/mapper/RoleMapper.xml"/>
+    <mapper resource="com/lin/mybatis/simple/mapper/RolePrivilegeMapper.xml"/>
+    <mapper resource="com/lin/mybatis/simple/mapper/UserRoleMapper.xml"/>
+    <mapper resource="com/lin/mybatis/simple/mapper/UserMapper.xml"/>
+    
+    <!-- 
+        
+    
+    	// 这个配置会把包下的配置都引进来，所以前面单独引用的要注释掉
+    	// 不然会报错，貌似只有接口的会
+    	<package name="com.lin.mybatis.simple.mapper"/>
+      -->
+      
+    
+    
+  </mappers>
+  
+</configuration>
