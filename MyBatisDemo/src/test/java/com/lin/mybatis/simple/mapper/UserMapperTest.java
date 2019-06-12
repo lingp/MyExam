@@ -1,7 +1,10 @@
 package com.lin.mybatis.simple.mapper;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
@@ -159,30 +162,30 @@ public class UserMapperTest extends BaseMapperTest {
 //		}
 //	}
 	
-//	@Test
-//	public void testDeleteById() {
-//		SqlSession sqlSession = getSqlSession();
-//		try {
-//			UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
-//			SysUser user1 = userMapper.selectById(1L);
-//			
-//			Assert.assertNotNull(user1);
-//			Assert.assertEquals(1, userMapper.deleteById(1L));
-//			Assert.assertNull(userMapper.selectById(1L));
-//			
-//			SysUser user2 = userMapper.selectById(1001L);
-//			
-//			Assert.assertNotNull(user2);
-//			Assert.assertEquals(1, userMapper.deleteById(user2));
-//			
-//			Assert.assertNull(userMapper.selectById(1001L));
-//			
-//			
-//		} finally {
-//			sqlSession.rollback();
-//			sqlSession.close();
-//		}
-//	}
+	@Test
+	public void testDeleteById() {
+		SqlSession sqlSession = getSqlSession();
+		try {
+			UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+			SysUser user1 = userMapper.selectById(1L);
+			
+			Assert.assertNotNull(user1);
+			Assert.assertEquals(1, userMapper.deleteById(1L));
+			Assert.assertNull(userMapper.selectById(1L));
+			
+			SysUser user2 = userMapper.selectById(1001L);
+			
+			Assert.assertNotNull(user2);
+			Assert.assertEquals(1, userMapper.deleteById(user2));
+			
+			Assert.assertNull(userMapper.selectById(1001L));
+			
+			
+		} finally {
+			sqlSession.rollback();
+			sqlSession.close();
+		}
+	}
 	
 	@Test
 	public void testSelectRolesByUserIdAndRoleEnabled() {
@@ -197,4 +200,164 @@ public class UserMapperTest extends BaseMapperTest {
 		}
 	}
 	
+	@Test
+	public void testSelectByUser() {
+		SqlSession sqlSession = getSqlSession();
+		try {
+			UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+			// 只查询用户名
+			SysUser query = new SysUser();
+			query.setUserName("ad");
+			List<SysUser> userList = userMapper.selectByUser(query);
+			Assert.assertTrue(userList.size() > 0);
+			
+			// 只查询用户邮箱时
+			query = new SysUser();
+			query.setUserEmail("test@qq.com");
+			userList = userMapper.selectByUser(query);
+			Assert.assertTrue(userList.size() > 0);
+			
+			//同时查询用户和邮箱时
+			query = new SysUser();
+			query.setUserName("ad");
+			query.setUserEmail("test@qq.com");
+			userList = userMapper.selectByUser(query);
+			Assert.assertTrue(userList.size() == 0);
+			
+		} finally {
+			sqlSession.close();
+		}
+	}
+	
+	@Test
+	public void testUpdateByIdSelective() {
+		SqlSession sqlSession = getSqlSession();
+		try {
+			UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+			SysUser sysUser = new SysUser();
+			sysUser.setId(1L);
+			sysUser.setUserEmail("test@qq.com");	
+			int result =  userMapper.updateByIdSelective(sysUser);
+			Assert.assertEquals(1, result);
+			
+			sysUser = userMapper.selectById(1L);
+			Assert.assertEquals("admin", sysUser.getUserName());
+			Assert.assertEquals("test@qq.com", sysUser.getUserEmail());
+			
+			
+		} finally {
+			sqlSession.rollback();
+			sqlSession.close();
+		}
+	}
+	
+	@Test
+	public void testInsert2Selective() {
+		SqlSession sqlSession = getSqlSession();
+		try {
+			UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+			SysUser sysUser = new SysUser();
+			sysUser.setUserName("test-selective");
+			sysUser.setUserPassword("123456");
+			sysUser.setUserInfo("test info");
+			sysUser.setCreatedAt(new Date());
+			userMapper.insert2Selective(sysUser);
+			
+			sysUser = userMapper.selectById(sysUser.getId());
+			Assert.assertEquals("test@qq.com", sysUser.getUserEmail());
+			
+		} finally {
+			sqlSession.rollback();
+			sqlSession.close();
+		}
+	}
+	
+	
+	@Test
+	public void testSelectByIdOrUserName() {
+		SqlSession sqlSession = getSqlSession();
+		try {
+			UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+			
+			SysUser query = new SysUser();
+			query.setId(1L);
+			query.setUserName("admin");
+			SysUser sysUser = userMapper.selectByIdOrUserName(query);
+			Assert.assertNotNull(sysUser);
+			
+			query.setId(null);
+			sysUser = userMapper.selectByIdOrUserName(query);
+			Assert.assertNotNull(sysUser);
+			
+			query.setUserName(null);
+			sysUser = userMapper.selectByIdOrUserName(query);
+			Assert.assertNull(sysUser);
+		} finally {
+
+			sqlSession.close();
+		}
+	}
+	
+	@Test
+	public void testSelectByIdList() {
+		SqlSession sqlSession = getSqlSession();
+		try {
+			UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+			List<Long> idList = new ArrayList<Long>();
+			idList.add(1L);
+			idList.add(1001L);
+			
+			List<SysUser> userList = userMapper.selectByIdList(idList);
+			Assert.assertEquals(2,  userList.size());
+			
+		} finally {
+			sqlSession.close();
+		}
+	}
+	
+	@Test
+	public void testInsertList() {
+		SqlSession sqlSession = getSqlSession();
+		try {
+			UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+			List<SysUser> sysUsers = new ArrayList<SysUser>();
+			for(int i = 0; i < 2;  i++) {
+				SysUser sysUser = new SysUser();
+				sysUser.setUserName("test" + i);
+				sysUser.setUserPassword("123456");
+				sysUser.setUserEmail("test@qq.com");
+				sysUsers.add(sysUser);
+			}
+			int result = userMapper.insertList(sysUsers);
+			Assert.assertEquals(2, result);
+			
+			for(SysUser user : sysUsers) 
+			{
+				System.out.println(user.getId());
+			}
+		} finally {
+			sqlSession.rollback();
+			sqlSession.close();
+		}
+	}
+	
+	@Test
+	public void testUpdateByMap() {
+		SqlSession sqlSession = getSqlSession();
+		try {
+			UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", 1L);
+			map.put("user_email", "'test123@qq.com'");
+			map.put("user_password", "21312");
+			userMapper.updateByMap(map);
+			
+			SysUser sysUser = userMapper.selectById(1L);
+			Assert.assertEquals("test@qq.com", sysUser.getUserEmail());
+			
+		} finally {
+			sqlSession.rollback();
+			sqlSession.close();
+		}
+	}
 }
