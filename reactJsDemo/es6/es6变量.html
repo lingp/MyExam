@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        window.onload = function () {
+            var iBtns = document.getElementsByTagName('input');
+            for(var i = 0; i < iBtns.length; i++){
+                // 打印出的i都是3，因为var没有块级作用域
+                iBtns[i].onclick = function () {
+                    alert(i)
+                };
+
+                // 修改,只有函数有块级作用域，用匿名函数包起来
+                (function(i){
+                    iBtns[i].onclick = function () {
+                        alert(i)
+                    };
+                })(i);
+            }
+
+            // let有块级作用域
+            for(let i = 0; i < iBtns.length; i++){
+                iBtns[i].onclick = function () {
+                    alert(i);
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <input type="button" value="按钮1" />
+    <input type="button" value="按钮2" />
+    <input type="button" value="按钮3" />
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generator</title>
+</head>
+<script>
+    function *test(){
+        alert('a');
+        let a = yield 'hello';
+        alert('b');
+        alert(a)
+    }
+    let t = test();
+    let a = t.next();
+    console.log(a);
+    t.next(1);
+
+</script>
+<body>
+
+</body>
+</html>
