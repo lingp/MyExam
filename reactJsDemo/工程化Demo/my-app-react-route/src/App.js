@@ -1,0 +1,54 @@
+import React from 'react';
+import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
+import './App.css';
+
+
+import Hot from './components/Hot';
+import Follow from './components/Follow';
+import Recommends from './components/Recommends';
+import Hdetail from './components/Hdetail';
+import Login from './components/Login';
+
+
+
+class App extends React.Component{
+    constructor(props){
+      super(props);
+    }
+
+    render(){
+      return (
+          <Router>
+            <div className="App">
+
+              <nav>
+                <ul>
+                  <li>
+                    <Link to="/">推荐</Link>
+                  </li>
+                  <li>
+                    <Link to="/hot">热榜</Link>
+                  </li>
+                  <li>
+                    <Link to="/follow">关注</Link>
+                  </li>
+                </ul>
+              </nav>
+
+              <Route path="/" exact component={Recommends}/>
+              <Route path="/hot" component={Hot} />
+              <Route path="/follow/" component={Follow} />
+              <Route path="/hdetail/" component={Hdetail} />
+              <Route path="/login/" component={Login} />
+
+
+
+
+            </div>
+          </Router>
+      )
+    }
+}
+
+
+export default App;
